@@ -1,18 +1,9 @@
 #!/bin/bash
 
-# Hello ! 
-# This is a simple/minimal script 
-# To fetch some basic information about your system
-# I made this for my own personal use 
-# It is limited as you can see
-# It's my own take on neofetch but less flashy and less fancy lol
-# I understand that my code isn't 5* quality ,so yeah ...
-# I only tested it on Kali and Ubuntu 
-# On other distros some commands won't work
-# So please feel free to change whatever command
-# Does not work with the appropriate one for your system .
+# A simple script to fetch basic system information
+# Tested on Kali and Ubuntu, may need adjustments for other distributions.
 
-#Colors
+# Colors
 grey="\033[0;37m"
 purple="\033[0;35m"
 red="\033[1;31m"
@@ -20,58 +11,66 @@ green="\033[1;32m"
 yellow="\033[1;33m"
 transparent="\e[0m"
 
-#Commands & variables
+# Check dependencies
+required_commands=("awk" "sed" "grep" "lspci" "cut" "tr")
+for cmd in "${required_commands[@]}"; do
+  if ! command -v $cmd &> /dev/null; then
+    echo "Error: $cmd is not installed." >&2
+    exit 1
+  fi
+done
 
-#OS 
+# OS
 os=$(awk -F= '/^PRETTY_NAME=/{print $2}' /etc/os-release | tr -d '"')
 
-#CPU info
-cpuTemp="$(cat /proc/cpuinfo | grep 'model name' |uniq)"
-readarray -d : -t strarrcpu <<< $cpuTemp
-cpu="$(echo -e "${strarrcpu[1]}"  | tr -d '[:space:]')"
+# CPU info
+cpu=$(awk -F: '/model name/ {gsub(/^[ \t]+|[ \t]+$/, "", $2); print $2; exit}' /proc/cpuinfo)
 
-#RAM info
-ramTemp="$(cat /proc/meminfo | grep 'MemTotal')"
-readarray -d : -t strarrram <<< $ramTemp
-#trim white spaces and removes the kB at the end so it can be displayed as Mb afterwards
-ramx="$(echo -e "${strarrram[1]}"  | tr -d '[:space:]' | sed 's/..$//' )"
-ram=$((ramx / 1000))
+# RAM info
+ram_kb=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
+ram=$((ram_kb / 1024)) # Convert from kB to MB
 
-#Hostname
-host="$(cat /proc/sys/kernel/hostname)"
+# Hostname
+host=$(cat /proc/sys/kernel/hostname)
 
-#Number of packages installed (everything included)
-pkgs="$(dpkg --get-selections | wc --lines)"
+# Number of packages installed
+if command -v dpkg &> /dev/null; then
+  pkgs=$(dpkg --get-selections | wc -l)
+elif command -v rpm &> /dev/null; then
+  pkgs=$(rpm -qa | wc -l)
+elif command -v pacman &> /dev/null; then
+  pkgs=$(pacman -Q | wc -l)
+elif command -v brew &> /dev/null; then
+  pkgs=$(brew list | wc -l)
+else
+  pkgs="N/A"
+fi
 
-#Uptime
-up="$(uptime | awk -F'( |,|:)+' '{d=h=m=0; if ($7=="min") m=$6; else {if ($7~/^day/) {d=$6;h=$8;m=$9} else {h=$6;m=$7}}} {print d+0,"d,",h+0,"h,",m+0,"m."}')"
+# Uptime
+up=$(awk '{d=$1/86400; h=($1%86400)/3600; m=($1%3600)/60; printf "%dd, %dh, %dm\n", d, h, m}' /proc/uptime)
 
+# GPU info
+gpu=$(lspci | grep VGA | cut -d ':' -f 3 | cut -d '[' -f 1 | sed 's/^ *//')
 
-# Main function
-Shama(){
-while true;
-do
-        #echo ""
-        echo -e "            "$green"——-"$purple"SH"$red"."$purple"AMA"$green"-——"   
-        echo -e ""    
-        echo -e "      "$green"|"$purple"■"$grey" OS     "  $red":" $grey" ${os^^}    "
-        echo -e "      "$purple"|"$green"■"$grey" UP     "  $red":" $grey" ${up}     "
-        echo -e "      "$green"|"$purple"■"$grey" CPU    "  $red":" $grey" ${cpu^^}     "
-        echo -e "      "$purple"|"$green"■"$grey" RAM    "  $red":" $grey" ${ram}Mb    "
-        echo -e "      "$green"|"$purple"■"$grey" HOST   "  $red":" $grey" ${host^^}     "
-        echo -e "      "$purple"|"$green"■"$grey" PKGS   "  $red":" $grey" ${pkgs}     "
-        echo ""
-
- break;
-done
-echo 
+# Main function to display info
+display_info() {
+  echo -e "            ${green}——-${purple}SH${red}.${purple}AMA${green}-——"   
+  echo -e ""    
+  echo -e "      ${green}|${purple}■${grey} OS     ${red}: ${grey} ${os^^}"
+  echo -e "      ${purple}|${green}■${grey} UPTIME ${red}: ${grey} ${up}"
+  echo -e "      ${green}|${purple}■${grey} CPU    ${red}: ${grey} ${cpu^^}"
+  echo -e "      ${purple}|${green}■${grey} RAM    ${red}: ${grey} ${ram}MB"
+  echo -e "      ${green}|${purple}■${grey} HOST   ${red}: ${grey} ${host^^}"
+  echo -e "      ${purple}|${green}■${grey} PKGS   ${red}: ${grey} ${pkgs}"
+  echo -e "      ${green}|${purple}■${grey} GPU    ${red}: ${grey} ${gpu}"
+  echo -e ""
 }
 
-#Logo
+# Logo
 echo -e ""
 echo -e "               |\_/|"
-echo -e "               '"$yellow"o"$transparent"."$yellow"o"$transparent"'"  
+echo -e "               '"$yellow"o"$transparent"."$yellow"o"$transparent"'"
 echo -e "               > ^ <"
 
 # Main function init
-Shama;
+display_info
