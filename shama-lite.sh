@@ -23,10 +23,7 @@ transparent="\e[0m"
 #Commands & variables
 
 #OS 
-osTemp="$(cat /etc/os-release | grep "ID" | head -1)"
-readarray -d = -t strarr <<< $osTemp
-#removing trailing spaces
-os="$(echo -e "${strarr[1]}" | sed -e 's/[[:space:]]*$//')"
+os=$(awk -F= '/^PRETTY_NAME=/{print $2}' /etc/os-release | tr -d '"')
 
 #CPU info
 cpuTemp="$(cat /proc/cpuinfo | grep 'model name' |uniq)"
