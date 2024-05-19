@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # A simple script to fetch basic system information
-# Tested on Kali and Ubuntu, may need adjustments for other distributions.
+# Tested on Kali, ubuntu, arch may need adjustments for other distributions.
 
 # Colors
 grey="\033[0;37m"
