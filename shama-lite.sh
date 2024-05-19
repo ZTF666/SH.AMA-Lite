@@ -44,7 +44,17 @@ ram=$((ramx / 1000))
 host="$(cat /proc/sys/kernel/hostname)"
 
 #Number of packages installed (everything included)
-pkgs="$(dpkg --get-selections | wc --lines)"
+if command -v dpkg &> /dev/null; then
+  pkgs=$(dpkg --get-selections | wc -l)
+elif command -v rpm &> /dev/null; then
+  pkgs=$(rpm -qa | wc -l)
+elif command -v pacman &> /dev/null; then
+  pkgs=$(pacman -Q | wc -l)
+elif command -v brew &> /dev/null; then
+  pkgs=$(brew list | wc -l)
+else
+  pkgs="N/A"
+fi
 
 #Uptime
 up="$(uptime | awk -F'( |,|:)+' '{d=h=m=0; if ($7=="min") m=$6; else {if ($7~/^day/) {d=$6;h=$8;m=$9} else {h=$6;m=$7}}} {print d+0,"d,",h+0,"h,",m+0,"m."}')"
