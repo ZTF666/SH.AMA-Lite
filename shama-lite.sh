@@ -77,11 +77,12 @@ display_info() {
   echo -e ""
 }
 
-# Logo
+#Logo
 echo -e ""
 echo -e "               |\_/|"
-echo -e "               '"$yellow"o"$transparent"."$yellow"o"$transparent"'"
+echo -e "               '"$yellow"o"$transparent"."$yellow"o"$transparent"'"  
 echo -e "               > ^ <"
+
 
 # Main function init
 display_info
