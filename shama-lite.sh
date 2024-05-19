@@ -59,10 +59,10 @@ display_info() {
   echo -e "      ${green}|${purple}■${grey} OS     ${red}: ${grey} ${os^^}"
   echo -e "      ${purple}|${green}■${grey} UPTIME ${red}: ${grey} ${up}"
   echo -e "      ${green}|${purple}■${grey} CPU    ${red}: ${grey} ${cpu^^}"
+  echo -e "      ${green}|${purple}■${grey} GPU    ${red}: ${grey} ${gpu}"
   echo -e "      ${purple}|${green}■${grey} RAM    ${red}: ${grey} ${ram}MB"
   echo -e "      ${green}|${purple}■${grey} HOST   ${red}: ${grey} ${host^^}"
   echo -e "      ${purple}|${green}■${grey} PKGS   ${red}: ${grey} ${pkgs}"
-  echo -e "      ${green}|${purple}■${grey} GPU    ${red}: ${grey} ${gpu}"
   echo -e ""
 }
 
