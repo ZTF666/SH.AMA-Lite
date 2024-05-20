@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # A simple script to fetch basic system information
-# Tested on Kali, ubuntu, arch may need adjustments for other distributions.
+# Tested on Kali, ubuntu, and arch may need adjustments for other distributions.
 
 # Colors
 grey="\033[0;37m"
@@ -63,17 +63,21 @@ fi
 # Uptime
 up=$(awk '{d=$1/86400; h=($1%86400)/3600; m=($1%3600)/60; printf "%dd, %dh, %dm\n", d, h, m}' /proc/uptime)
 
+# Current date and time
+datetime=$(date '+%Y-%m-%d %H:%M:%S')
+
 # Main function to display info
 display_info() {
   echo -e "            ${green}——-${purple}SH${red}.${purple}AMA${green}-——"   
   echo -e ""    
-  echo -e "      ${green}|${purple}■${grey} OS     ${red}: ${grey} ${os^^}"
-  echo -e "      ${purple}|${green}■${grey} UPTIME ${red}: ${grey} ${up}"
-  echo -e "      ${green}|${purple}■${grey} CPU    ${red}: ${grey} ${cpu^^}"
-  echo -e "      ${green}|${purple}■${grey} GPU    ${red}: ${grey} ${gpu}"
-  echo -e "      ${purple}|${green}■${grey} RAM    ${red}: ${grey} ${ram}MB"
-  echo -e "      ${green}|${purple}■${grey} HOST   ${red}: ${grey} ${host^^}"
-  echo -e "      ${purple}|${green}■${grey} PKGS   ${red}: ${grey} ${pkgs}"
+  echo -e "      ${green}|${purple}■${grey} OS       ${red}: ${grey} ${os^^}"
+  echo -e "      ${green}|${purple}■${grey} DATETIME ${red}: ${grey} ${datetime}"
+  echo -e "      ${purple}|${green}■${grey} UPTIME   ${red}: ${grey} ${up}"
+  echo -e "      ${green}|${purple}■${grey} CPU      ${red}: ${grey} ${cpu^^}"
+  echo -e "      ${green}|${purple}■${grey} GPU      ${red}: ${grey} ${gpu}"
+  echo -e "      ${purple}|${green}■${grey} RAM      ${red}: ${grey} ${ram}MB"
+  echo -e "      ${green}|${purple}■${grey} HOST     ${red}: ${grey} ${host^^}"
+  echo -e "      ${purple}|${green}■${grey} PKGS     ${red}: ${grey} ${pkgs}"
   echo -e ""
 }
 
