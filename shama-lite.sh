@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # A simple script to fetch basic system information
-# Tested on Kali, ubuntu, arch may need adjustments for other distributions.
+# Tested on Kali, ubuntu, and arch may need adjustments for other distributions.
 
 # Colors
 grey="\033[0;37m"
@@ -73,10 +73,6 @@ kernel=$(uname -r)
 # Disk usage
 disk=$(df -h / | awk 'NR==2 {print $3 "/" $2 " (" $5 " used)"}')
 
-# Kernel version
-kernel=$(uname -r)
-
-
 # Load average
 loadavg=$(uptime | awk -F'load average:' '{print $2}' | sed 's/^ *//')
 
@@ -86,9 +82,7 @@ processes=$(ps aux | wc -l)
 # Current date and time
 datetime=$(date '+%Y-%m-%d %H:%M:%S')
 
-
-
-## Main function to display info
+# Main function to display info
 display_info() {
   echo -e "            ${green}——-${purple}SH${red}.${purple}AMA${green}-——"   
   echo -e ""    
