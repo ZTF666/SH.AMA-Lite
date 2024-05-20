@@ -11,7 +11,10 @@
 <p>Tested on :</p>
 <img src="https://www.vectorlogo.zone/logos/ubuntu/ubuntu-ar21.svg" alt="ubuntu" width="80" />
 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Kali_Linux_2.0_wordmark.svg/1920px-Kali_Linux_2.0_wordmark.svg.png" alt="kali" width="50" />
+<img src="https://www.vectorlogo.zone/logos/archlinux/archlinux-icon.svg"alt="arch" width="50" />
 </div>
+
+
 
 
 

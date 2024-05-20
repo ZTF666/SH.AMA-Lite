@@ -44,6 +44,10 @@ cpu=$(awk -F: '/model name/ {gsub(/^[ \t]+|[ \t]+$/, "", $2); print $2; exit}' /
 ram_kb=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
 ram=$((ram_kb / 1024)) # Convert from kB to MB
 
+# Swap memory info
+swap_kb=$(awk '/SwapTotal/ {print $2}' /proc/meminfo)
+swap=$((swap_kb / 1024)) # Convert from kB to MB
+
 # Hostname
 host=$(cat /proc/sys/kernel/hostname)
 
@@ -63,6 +67,18 @@ fi
 # Uptime
 up=$(awk '{d=$1/86400; h=($1%86400)/3600; m=($1%3600)/60; printf "%dd, %dh, %dm\n", d, h, m}' /proc/uptime)
 
+# Kernel version
+kernel=$(uname -r)
+
+# Disk usage
+disk=$(df -h / | awk 'NR==2 {print $3 "/" $2 " (" $5 " used)"}')
+
+# Load average
+loadavg=$(uptime | awk -F'load average:' '{print $2}' | sed 's/^ *//')
+
+# Number of processes
+processes=$(ps aux | wc -l)
+
 # Current date and time
 datetime=$(date '+%Y-%m-%d %H:%M:%S')
 
@@ -70,14 +86,19 @@ datetime=$(date '+%Y-%m-%d %H:%M:%S')
 display_info() {
   echo -e "            ${green}——-${purple}SH${red}.${purple}AMA${green}-——"   
   echo -e ""    
-  echo -e "      ${green}|${purple}■${grey} OS       ${red}: ${grey} ${os^^}"
-  echo -e "      ${green}|${purple}■${grey} DATETIME ${red}: ${grey} ${datetime}"
-  echo -e "      ${purple}|${green}■${grey} UPTIME   ${red}: ${grey} ${up}"
-  echo -e "      ${green}|${purple}■${grey} CPU      ${red}: ${grey} ${cpu^^}"
-  echo -e "      ${green}|${purple}■${grey} GPU      ${red}: ${grey} ${gpu}"
-  echo -e "      ${purple}|${green}■${grey} RAM      ${red}: ${grey} ${ram}MB"
-  echo -e "      ${green}|${purple}■${grey} HOST     ${red}: ${grey} ${host^^}"
-  echo -e "      ${purple}|${green}■${grey} PKGS     ${red}: ${grey} ${pkgs}"
+  echo -e "      ${green}|${purple}■${grey} OS        ${red}: ${grey} ${os^^}"
+  echo -e "      ${green}|${purple}■${grey} KERNEL    ${red}: ${grey} ${kernel}"
+  echo -e "      ${green}|${purple}■${grey} HOST      ${red}: ${grey} ${host^^}"
+  echo -e "      ${purple}|${green}■${grey} UPTIME    ${red}: ${grey} ${up}"
+  echo -e "      ${green}|${purple}■${grey} CPU       ${red}: ${grey} ${cpu^^}"
+  echo -e "      ${green}|${purple}■${grey} GPU       ${red}: ${grey} ${gpu}"
+  echo -e "      ${purple}|${green}■${grey} RAM       ${red}: ${grey} ${ram}MB"
+  echo -e "      ${green}|${purple}■${grey} SWAP      ${red}: ${grey} ${swap}MB"
+  echo -e "      ${purple}|${green}■${grey} PKGS      ${red}: ${grey} ${pkgs}"
+  echo -e "      ${purple}|${green}■${grey} DISK      ${red}: ${grey} ${disk}"
+  echo -e "      ${green}|${purple}■${grey} LOAD AVG  ${red}: ${grey} ${loadavg}"
+  echo -e "      ${purple}|${green}■${grey} PROCESSES ${red}: ${grey} ${processes}"
+  echo -e "      ${green}|${purple}■${grey} DATETIME  ${red}: ${grey} ${datetime}"
   echo -e ""
 }
 
