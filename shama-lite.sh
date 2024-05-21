@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # A simple script to fetch basic system information
-# Tested on Kali, ubuntu, and arch may need adjustments for other distributions.
+# Tested on Kali, Ubuntu, and Arch; may need adjustments for other distributions.
 
 # Colors
 grey="\033[0;37m"
@@ -34,24 +34,21 @@ else
   gpu=$(lspci | grep VGA | cut -d ':' -f 3 | cut -d '[' -f 1 | sed 's/^ *//')
 fi
 
-# OS
+# Fetching system information
 os=$(awk -F= '/^PRETTY_NAME=/{print $2}' /etc/os-release | tr -d '"')
-
-# CPU info
 cpu=$(awk -F: '/model name/ {gsub(/^[ \t]+|[ \t]+$/, "", $2); print $2; exit}' /proc/cpuinfo)
-
-# RAM info
 ram_kb=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
 ram=$((ram_kb / 1024)) # Convert from kB to MB
-
-# Swap memory info
 swap_kb=$(awk '/SwapTotal/ {print $2}' /proc/meminfo)
 swap=$((swap_kb / 1024)) # Convert from kB to MB
-
-# Hostname
 host=$(cat /proc/sys/kernel/hostname)
+kernel=$(uname -r)
+disk=$(df -h / | awk 'NR==2 {print $3 "/" $2 " (" $5 " used)"}')
+loadavg=$(uptime | awk -F'load average:' '{print $2}' | sed 's/^ *//')
+processes=$(ps aux | wc -l)
+datetime=$(date '+%Y-%m-%d %H:%M:%S')
 
-# Number of packages installed
+# Determine package manager and count installed packages
 if command -v dpkg &> /dev/null; then
   pkgs=$(dpkg --get-selections | wc -l)
 elif command -v rpm &> /dev/null; then
@@ -64,28 +61,13 @@ else
   pkgs="N/A"
 fi
 
-# Uptime
+# Calculate system uptime
 up=$(awk '{d=$1/86400; h=($1%86400)/3600; m=($1%3600)/60; printf "%dd, %dh, %dm\n", d, h, m}' /proc/uptime)
-
-# Kernel version
-kernel=$(uname -r)
-
-# Disk usage
-disk=$(df -h / | awk 'NR==2 {print $3 "/" $2 " (" $5 " used)"}')
-
-# Load average
-loadavg=$(uptime | awk -F'load average:' '{print $2}' | sed 's/^ *//')
-
-# Number of processes
-processes=$(ps aux | wc -l)
-
-# Current date and time
-datetime=$(date '+%Y-%m-%d %H:%M:%S')
 
 # Main function to display info
 display_info() {
-  echo -e "            ${green}——-${purple}SH${red}.${purple}AMA${green}-——"   
-  echo -e ""    
+  echo -e "            ${green}——-${purple}SH${red}.${purple}AMA${green}-——"
+  echo -e ""
   echo -e "      ${green}|${purple}■${grey} OS        ${red}: ${grey} ${os^^}"
   echo -e "      ${green}|${purple}■${grey} KERNEL    ${red}: ${grey} ${kernel}"
   echo -e "      ${green}|${purple}■${grey} HOST      ${red}: ${grey} ${host^^}"
@@ -102,11 +84,11 @@ display_info() {
   echo -e ""
 }
 
-# Logo
+# Display ASCII logo
 echo -e ""
 echo -e "               |\_/|"
-echo -e "               '${yellow}o${transparent}.${yellow}o${transparent}'"  
+echo -e "               '${yellow}o${transparent}.${yellow}o${transparent}'"
 echo -e "               > ^ <"
 
-# Main function init
+# Call main function to display information
 display_info
