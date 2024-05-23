@@ -63,59 +63,6 @@ elif command -v brew &> /dev/null; then
 else
   pkgs="N/A"
 fi
-
-# Calculate system uptime
-up=$(awk '{d=$1/86400; h=($1%86400)/3600; m=($1%3600)/60; printf "%dd, %dh, %dm\n", d, h, m}' /proc/uptime)
-
-# Main function to display info
-display_info() {
-  echo -e "            ${green}——-${purple}SH${red}.${purple}AMA${green}-——"
-  echo -e ""
-  echo -e "      ${green}|${purple}■${grey} OS        ${red}: ${grey} ${os^^}"
-  echo -e "      ${green}|${purple}■${grey} KERNEL    ${red}: ${grey} ${kernel}"
-  echo -e "      ${green}|${purple}■${grey} HOST      ${red}: ${grey} ${host^^}"
-  echo -e "      ${purple}|${green}■${grey} UPTIME    ${red}: ${grey} ${up}"
-  echo -e "      ${green}|${purple}■${grey} CPU       ${red}: ${grey} ${cpu^^} (${cpu_cores} cores, ${cpu_threads} threads)"
-  echo -e "      ${green}|${purple}■${grey} GPU       ${red}: ${grey} ${gpu}"
-  echo -e "      ${purple}|${green}■${grey} RAM       ${red}: ${grey} ${ram}MB"
-  echo -e "      ${green}|${purple}■${grey} SWAP      ${red}: ${grey} ${swap}MB"
-  echo -e "      ${purple}|${green}■${grey} PKGS      ${red}: ${grey} ${pkgs}"
-  echo -e "      ${purple}|${green}■${grey} DISK      ${red}: ${grey} ${disk}"
-  echo -e "      ${purple}|${green}■${grey} LOAD AVG  ${red}: ${grey} ${loadavg}"
-  echo -e "      ${purple}|${green}■${grey} PROCESSES ${red}: ${grey} ${processes}"
-  echo -e "      ${green}|${purple}■${grey} DATETIME  ${red}: ${grey} ${datetime}"
-  if [ -n "$battery_status" ]; then
-    echo -e "      ${green}|${purple}■${grey} BATTERY   ${red}: ${grey} ${battery_status}"
-  fi
-  echo -e ""
-
-  echo -e "      ${purple}|${green}■${grey} DISK USAGE:"
-
-  # Display detailed disk usage in a table-like format
-  printf "      %-30s %-10s %-10s %-10s\n" "Filesystem" "Size" "Used" "Use%"
-  df -h | awk 'NR>1 {printf "      %-30s %-10s %-10s %-10s\n", $1, $2, $3, $5}'
-}
-
-# Display ASCII logo
-echo -e ""
-echo -e "               |\_/|"
-echo -e "               '${yellow}o${transparent}.${yellow}o${transparent}'"
-echo -e "               > ^ <"
-
-# Call main function to display information
-display_info
-
-
-
-
-
-
-
-
-
-
-
-
 # Function to check for missing dependencies
 check_dependencies() {
     required_commands=("awk" "sed" "grep" "cut" "tr" "df" "uname" "uptime" "ps" "date" "ip")
@@ -172,3 +119,56 @@ fetch_system_info() {
 
     up=$(awk '{d=$1/86400; h=($1%86400)/3600; m=($1%3600)/60; printf "%dd, %dh, %dm\n", d, h, m}' /proc/uptime)
 }
+
+# Calculate system uptime
+up=$(awk '{d=$1/86400; h=($1%86400)/3600; m=($1%3600)/60; printf "%dd, %dh, %dm\n", d, h, m}' /proc/uptime)
+
+# Main function to display info
+display_info() {
+  echo -e "            ${green}——-${purple}SH${red}.${purple}AMA${green}-——"
+  echo -e ""
+  echo -e "      ${green}|${purple}■${grey} OS        ${red}: ${grey} ${os^^}"
+  echo -e "      ${green}|${purple}■${grey} KERNEL    ${red}: ${grey} ${kernel}"
+  echo -e "      ${green}|${purple}■${grey} HOST      ${red}: ${grey} ${host^^}"
+  echo -e "      ${purple}|${green}■${grey} UPTIME    ${red}: ${grey} ${up}"
+  echo -e "      ${green}|${purple}■${grey} CPU       ${red}: ${grey} ${cpu^^} (${cpu_cores} cores, ${cpu_threads} threads)"
+  echo -e "      ${green}|${purple}■${grey} GPU       ${red}: ${grey} ${gpu}"
+  echo -e "      ${purple}|${green}■${grey} RAM       ${red}: ${grey} ${ram}MB"
+  echo -e "      ${green}|${purple}■${grey} SWAP      ${red}: ${grey} ${swap}MB"
+  echo -e "      ${purple}|${green}■${grey} PKGS      ${red}: ${grey} ${pkgs}"
+  echo -e "      ${purple}|${green}■${grey} DISK      ${red}: ${grey} ${disk}"
+  echo -e "      ${purple}|${green}■${grey} LOAD AVG  ${red}: ${grey} ${loadavg}"
+  echo -e "      ${purple}|${green}■${grey} PROCESSES ${red}: ${grey} ${processes}"
+  echo -e "      ${green}|${purple}■${grey} DATETIME  ${red}: ${grey} ${datetime}"
+  if [ -n "$battery_status" ]; then
+    echo -e "      ${green}|${purple}■${grey} BATTERY   ${red}: ${grey} ${battery_status}"
+  fi
+  echo -e ""
+
+  echo -e "      ${purple}|${green}■${grey} DISK USAGE:"
+
+  # Display detailed disk usage in a table-like format
+  printf "      %-30s %-10s %-10s %-10s\n" "Filesystem" "Size" "Used" "Use%"
+  df -h | awk 'NR>1 {printf "      %-30s %-10s %-10s %-10s\n", $1, $2, $3, $5}'
+}
+
+# Display ASCII logo
+echo -e ""
+echo -e "               |\_/|"
+echo -e "               '${yellow}o${transparent}.${yellow}o${transparent}'"
+echo -e "               > ^ <"
+
+# Call main function to display information
+display_info
+
+
+
+
+
+
+
+
+
+
+
+
