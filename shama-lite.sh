@@ -11,28 +11,7 @@ green="\033[1;32m"
 yellow="\033[1;33m"
 transparent="\e[0m"
 
-# Check dependencies
-required_commands=("awk" "sed" "grep" "cut" "tr" "df" "uname" "uptime" "ps" "date")
-missing_commands=()
 
-for cmd in "${required_commands[@]}"; do
-  if ! command -v $cmd &> /dev/null; then
-    missing_commands+=($cmd)
-  fi
-done
-
-if [ ${#missing_commands[@]} -ne 0 ]; then
-  echo "Error: The following required commands are not installed: ${missing_commands[*]}" >&2
-  exit 1
-fi
-
-# Check for lspci separately
-if ! command -v lspci &> /dev/null; then
-  echo "Warning: lspci is not installed. GPU information will not be displayed." >&2
-  gpu="N/A"
-else
-  gpu=$(lspci | grep VGA | cut -d ':' -f 3 | cut -d '[' -f 1 | sed 's/^ *//')
-fi
 
 # Fetching system information
 os=$(awk -F= '/^PRETTY_NAME=/{print $2}' /etc/os-release | tr -d '"')
@@ -65,7 +44,7 @@ else
 fi
 # Function to check for missing dependencies
 check_dependencies() {
-    required_commands=("awk" "sed" "grep" "cut" "tr" "df" "uname" "uptime" "ps" "date" "ip")
+    required_commands=("awk" "sed" "grep" "cut" "tr" "df" "uname" "uptime" "ps" "date")
     missing_commands=()
 
     for cmd in "${required_commands[@]}"; do
