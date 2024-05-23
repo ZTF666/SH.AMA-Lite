@@ -12,7 +12,7 @@ yellow="\033[1;33m"
 transparent="\e[0m"
 
 # Check dependencies
-required_commands=("awk" "sed" "grep" "cut" "tr" "df" "uname" "uptime" "ps" "date" "ip")
+required_commands=("awk" "sed" "grep" "cut" "tr" "df" "uname" "uptime" "ps" "date")
 missing_commands=()
 
 for cmd in "${required_commands[@]}"; do
