@@ -21,7 +21,7 @@
 # Demo
 <p>Taken from a vm running kali</p>
 <div align="center">
-<img src="scrshts/demo.png" alt="demo"/>
+<img src="scrshts/newdemo.png" alt="demo"/>
 </div>
 
 # Additional info
