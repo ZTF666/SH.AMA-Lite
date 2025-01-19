@@ -57,9 +57,18 @@ elif command -v pacman &> /dev/null; then
   pkgs=$(pacman -Q | wc -l)
 elif command -v brew &> /dev/null; then
   pkgs=$(brew list | wc -l)
+elif command -v zypper &> /dev/null; then
+  pkgs=$(zypper se --installed-only | wc -l)
+elif command -v pkg &> /dev/null; then
+  pkgs=$(pkg query "%n" | wc -l)
+elif command -v port &> /dev/null; then
+  pkgs=$(port installed | wc -l)
+elif command -v apk &> /dev/null; then
+  pkgs=$(apk info | wc -l)
 else
   pkgs="N/A"
 fi
+
 
 # Calculate system uptime
 up=$(awk '{d=$1/86400; h=($1%86400)/3600; m=($1%3600)/60; printf "%dd, %dh, %dm\n", d, h, m}' /proc/uptime)
