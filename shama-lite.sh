@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-
 # A simple script to fetch basic system information
-# Tested on Kali, Ubuntu, and Arch; may need adjustments for other distributions.
-
+# Tested on Kali, Ubuntu, Arch, and Raspberry Pi 5
 # Colors
 grey="\033[0;37m"
 purple="\033[0;35m"
@@ -26,17 +24,52 @@ if [ ${#missing_commands[@]} -ne 0 ]; then
   exit 1
 fi
 
-# Check for lspci separately
-if ! command -v lspci &> /dev/null; then
+# Detect if we're on a Raspberry Pi
+is_rpi=false
+if grep -q "Raspberry Pi" /proc/cpuinfo 2>/dev/null || grep -q "BCM" /proc/cpuinfo 2>/dev/null; then
+  is_rpi=true
+fi
+
+# GPU Detection
+if [ "$is_rpi" = true ]; then
+  # Raspberry Pi GPU detection
+  if [ -f /boot/firmware/config.txt ] || [ -f /boot/config.txt ]; then
+    # Get GPU from device tree or VideoCore
+    if command -v vcgencmd &> /dev/null; then
+      gpu="VideoCore VII (Raspberry Pi 5)"
+    else
+      gpu="VideoCore (Raspberry Pi)"
+    fi
+  else
+    gpu="VideoCore"
+  fi
+elif ! command -v lspci &> /dev/null; then
   echo "Warning: lspci is not installed. GPU information will not be displayed." >&2
   gpu="N/A"
 else
-  gpu=$(lspci | grep VGA | cut -d ':' -f 3 | cut -d '[' -f 1 | sed 's/^ *//')
+  gpu=$(lspci | grep -E "VGA|3D" | cut -d ':' -f 3 | cut -d '[' -f 1 | sed 's/^ *//')
+  [ -z "$gpu" ] && gpu="N/A"
 fi
 
 # Fetching system information
 os=$(awk -F= '/^PRETTY_NAME=/{print $2}' /etc/os-release | tr -d '"')
-cpu=$(awk -F: '/model name/ {gsub(/^[ \t]+|[ \t]+$/, "", $2); print $2; exit}' /proc/cpuinfo)
+
+# CPU Detection - different for ARM/Pi vs x86
+if [ "$is_rpi" = true ]; then
+  # Raspberry Pi CPU detection
+  cpu_model=$(awk -F': ' '/^Model/{print $2; exit}' /proc/cpuinfo)
+  cpu_cores=$(grep -c "^processor" /proc/cpuinfo)
+  if [ -n "$cpu_model" ]; then
+    cpu="${cpu_model} (${cpu_cores} cores)"
+  else
+    cpu="ARM Processor (${cpu_cores} cores)"
+  fi
+else
+  # x86/x64 CPU detection
+  cpu=$(awk -F: '/model name/ {gsub(/^[ \t]+|[ \t]+$/, "", $2); print $2; exit}' /proc/cpuinfo)
+  [ -z "$cpu" ] && cpu="Unknown CPU"
+fi
+
 ram_kb=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
 ram=$((ram_kb / 1024)) # Convert from kB to MB
 swap_kb=$(awk '/SwapTotal/ {print $2}' /proc/meminfo)
@@ -69,7 +102,6 @@ else
   pkgs="N/A"
 fi
 
-
 # Calculate system uptime
 up=$(awk '{d=$1/86400; h=($1%86400)/3600; m=($1%3600)/60; printf "%dd, %dh, %dm\n", d, h, m}' /proc/uptime)
 
@@ -81,7 +113,7 @@ display_info() {
   echo -e "      ${purple}|${green}■${grey} KERNEL    ${red}: ${grey} ${kernel}"
   echo -e "      ${green}|${purple}■${grey} HOST      ${red}: ${grey} ${host^^}"
   echo -e "      ${purple}|${green}■${grey} UPTIME    ${red}: ${grey} ${up}"
-  echo -e "      ${green}|${purple}■${grey} CPU       ${red}: ${grey} ${cpu^^}"
+  echo -e "      ${green}|${purple}■${grey} CPU       ${red}: ${grey} ${cpu}"
   echo -e "      ${purple}|${green}■${grey} GPU       ${red}: ${grey} ${gpu}"
   echo -e "      ${green}|${purple}■${grey} RAM       ${red}: ${grey} ${ram}MB"
   echo -e "      ${purple}|${green}■${grey} SWAP      ${red}: ${grey} ${swap}MB"
